@@ -1,0 +1,64 @@
+# Proyecto de Xcode de Sonuvio para iPhone y iPad. No se guarda el .xcodeproj: se genera con XcodeGen
+# (`xcodegen generate`) en el Mac que compila, que es lo que hace .github/workflows/compilar-ios.yml.
+name: Sonuvio
+options:
+  bundleIdPrefix: app.sonuvio
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    MARKETING_VERSION: "1.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+targets:
+  Sonuvio:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sonuvio
+    scheme: {}
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.sonuvio.ios
+        PRODUCT_NAME: Sonuvio
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_BITCODE: NO
+    info:
+      path: Sonuvio/Info.plist
+      properties:
+        CFBundleDisplayName: Sonuvio
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSRequiresIPhoneOS: true
+        ITSAppUsesNonExemptEncryption: false
+        # La música sigue sonando con la pantalla bloqueada o en otra app.
+        UIBackgroundModes: [audio]
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIStatusBarStyle: UIStatusBarStyleLightContent
+        UIViewControllerBasedStatusBarAppearance: true
+        UIRequiresFullScreen: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+          UISceneConfigurations:
+            UIWindowSceneSessionRoleApplication:
+              - UISceneConfigurationName: Default
+                UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+        # Un servidor propio en casa puede ir por http dentro de la app (por ejemplo http://192.168.1.20:4173).
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoadsInWebContent: true
+        # La web permite elegir foto de perfil e importar música: el selector de iOS ofrece cámara y fotos.
+        NSCameraUsageDescription: Sonuvio usa la cámara solo si eliges hacer una foto para tu perfil.
+        NSPhotoLibraryUsageDescription: Sonuvio abre tus fotos solo si eliges una imagen para tu perfil.

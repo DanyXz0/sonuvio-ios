@@ -1,0 +1,58 @@
+# Compila Sonuvio para iPhone en un Mac de GitHub y deja Sonuvio-iOS.ipa sin firmar para instalarlo con Sideloadly.
+# Se lanza a mano (Actions → «Compilar Sonuvio para iPhone» → Run workflow) o al subir cambios a main.
+name: Compilar Sonuvio para iPhone
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  compilar:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Generar el proyecto de Xcode
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Compilar sin firmar
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Sonuvio.xcodeproj \
+            -scheme Sonuvio \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build | tee build.log | grep -E "error:|warning: .*Sonuvio/|BUILD (SUCCEEDED|FAILED)" || true
+          test -d build/Build/Products/Release-iphoneos/Sonuvio.app
+
+      - name: Empaquetar el .ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/Sonuvio.app Payload/
+          zip -qry Sonuvio-iOS.ipa Payload
+
+      - name: Guardar el .ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sonuvio-iOS
+          path: Sonuvio-iOS.ipa
+          retention-days: 30
+
+      - name: Guardar el registro si falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: registro-de-compilacion
+          path: build.log
+          retention-days: 7
