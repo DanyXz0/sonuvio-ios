@@ -1,11 +1,10 @@
 # Compila Sonuvio para iPhone en un Mac de GitHub y deja Sonuvio-iOS.ipa sin firmar para instalarlo con Sideloadly.
-# Se lanza a mano (Actions → «Compilar Sonuvio para iPhone» → Run workflow) o al subir cambios a main.
+# Se lanza a mano (Actions → «Compilar Sonuvio para iPhone» → Run workflow). No se lanza solo al subir cambios
+# mientras la cuenta de GitHub tenga bloqueados los Mac por facturación; ahora se compila en Codemagic (codemagic.yaml).
 name: Compilar Sonuvio para iPhone
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 jobs:
   compilar:
